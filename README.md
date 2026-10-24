@@ -45,6 +45,7 @@ src/
 `bootstrap/` contains one focused configuration module per shared concern, composed by `bootstrap/index.ts`. The main `index.ts` creates Fastify, applies the bootstrap, and registers feature routes. `server.ts` loads configuration and starts listening.
 
 Docker files live under `docker/`; project helper scripts live under `scripts/`.
+Development seed fixtures live under `scripts/seed/` and are applied only when you explicitly run `pnpm seed`.
 
 Shared application errors live in `shared/errors/` and are translated to HTTP responses by `bootstrap/error-handler.ts`. Shared utilities used by multiple modules live in `shared/utils/`. Provider-specific clients belong under `integrations/`; MongoDB client creation is in `integrations/mongodb/`.
 
@@ -91,6 +92,10 @@ pnpm dev
 ```
 
 Useful commands: `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm check`, and `pnpm start`.
+
+## Seed development data
+
+After configuring `MONGODB_URI` and `MONGODB_DATABASE` in `.env`, run `pnpm seed` to upsert the sample cities, cinemas, and shows. The operation uses stable IDs and is safe to rerun; it updates those sample records without deleting other database data. Do not point it at production data.
 
 ## Docker
 
