@@ -1,4 +1,5 @@
 import type { FastifyPluginAsync } from "fastify";
+import { NotFoundError } from "../../shared/errors/not-found-error.js";
 import { findCity, listCities } from "./service.js";
 
 export const cityRoutes: FastifyPluginAsync = async (app) => {
@@ -15,10 +16,10 @@ export const cityRoutes: FastifyPluginAsync = async (app) => {
         },
       },
     },
-    async (request, reply) => {
+    async (request) => {
       const city = findCity(request.params.cityId);
       if (!city) {
-        return reply.code(404).send({ error: "City not found" });
+        throw new NotFoundError("City");
       }
       return { data: city };
     },

@@ -1,4 +1,5 @@
 import type { FastifyPluginAsync } from "fastify";
+import { NotFoundError } from "../../shared/errors/not-found-error.js";
 import { findShow, listShows } from "./service.js";
 
 type ShowQuery = { cityId?: string; cinemaId?: string };
@@ -32,10 +33,10 @@ export const showRoutes: FastifyPluginAsync = async (app) => {
         },
       },
     },
-    async (request, reply) => {
+    async (request) => {
       const show = findShow(request.params.showId);
       if (!show) {
-        return reply.code(404).send({ error: "Show not found" });
+        throw new NotFoundError("Show");
       }
       return { data: show };
     },
