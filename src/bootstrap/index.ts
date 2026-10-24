@@ -6,6 +6,7 @@ import { configureHealthRoute } from "./health.js";
 import { configureHelmet } from "./helmet.js";
 import { configureMongo } from "./mongo.js";
 import { configureRateLimit } from "./rate-limit.js";
+import { configureSwagger } from "./swagger.js";
 
 export async function configureBootstrap(
   app: FastifyInstance,
@@ -18,6 +19,7 @@ export async function configureBootstrap(
     configureCors(app, config);
     configureRateLimit(app, config);
     configureErrorHandler(app);
+    configureSwagger(app, config);
     configureHealthRoute(app);
   } catch (error) {
     try {

@@ -9,6 +9,7 @@ export type AppConfig = {
   port: number;
   rateLimitMax: number;
   rateLimitWindow: number;
+  swaggerEnabled: boolean;
 };
 
 function readPositiveInteger(name: string, fallback: number) {
@@ -84,5 +85,6 @@ export function loadConfig(): AppConfig {
     port,
     rateLimitMax: readPositiveInteger("RATE_LIMIT_MAX", 100),
     rateLimitWindow: readPositiveInteger("RATE_LIMIT_WINDOW_MS", 60_000),
+    swaggerEnabled: process.env.NODE_ENV !== "production",
   };
 }

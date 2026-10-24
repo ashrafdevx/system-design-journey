@@ -19,6 +19,7 @@ src/
     helmet.ts
     cors.ts
     rate-limit.ts
+    swagger.ts
     error-handler.ts
     health.ts
   integrations/
@@ -63,6 +64,7 @@ Set these environment variables before starting the app:
 | `RATE_LIMIT_WINDOW_MS` | No | `60000` | Rate-limit window in milliseconds. |
 
 The bootstrap fails startup if MongoDB settings are missing or the connection fails. Fastify's Pino logger redacts common credential fields; MongoDB command payload logging is not enabled.
+Swagger UI is available at `/docs` outside production. It is disabled when `NODE_ENV=production`.
 
 ## Endpoints
 
@@ -79,6 +81,7 @@ List responses use `{ "data": [...] }`; item responses use `{ "data": {...} }`. 
 ## Run locally
 
 Requires Node.js 22 or later.
+The development command loads `.env` from the project root when present. It requires `MONGODB_URI` and `MONGODB_DATABASE` to be set in `.env` or the shell environment.
 
 ```bash
 pnpm install
