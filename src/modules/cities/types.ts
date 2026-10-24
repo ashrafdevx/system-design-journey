@@ -3,3 +3,5 @@ export type City = {
   name: string;
   state: string;
 };
+
+export type CityInput = Omit<City, "id">;

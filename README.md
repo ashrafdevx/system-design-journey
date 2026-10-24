@@ -1,6 +1,6 @@
 # BookMyShow API starter
 
-A small Fastify + TypeScript API starter for the initial BookMyShow domains. The HTTP APIs currently use in-memory sample data; MongoDB is connected for infrastructure setup and health checks. Persistence and booking flows are intentionally out of scope.
+A small Fastify + TypeScript API starter for the initial BookMyShow domains. Cities, cinemas, and shows use MongoDB persistence. Booking flows are intentionally out of scope.
 
 ## Structure
 
@@ -46,7 +46,7 @@ src/
 
 Docker files live under `docker/`; project helper scripts live under `scripts/`.
 
-Shared application errors live in `shared/errors/` and are translated to HTTP responses by `bootstrap/error-handler.ts`. Use `AppError` for typed HTTP errors and `NotFoundError` for missing resources. Shared utilities should be added when an actual helper is reused across features; avoid creating generic utility code prematurely. Provider-specific clients belong under `integrations/`; MongoDB client creation is in `integrations/mongodb/`.
+Shared application errors live in `shared/errors/` and are translated to HTTP responses by `bootstrap/error-handler.ts`. Shared utilities used by multiple modules live in `shared/utils/`. Provider-specific clients belong under `integrations/`; MongoDB client creation is in `integrations/mongodb/`.
 
 ## Configuration
 
@@ -69,14 +69,16 @@ Swagger UI is available at `/docs` outside production. It is disabled when `NODE
 ## Endpoints
 
 - `GET /health`
-- `GET /api/v1/cities`
-- `GET /api/v1/cities/:cityId`
-- `GET /api/v1/cinemas?cityId=city-mumbai`
-- `GET /api/v1/cinemas/:cinemaId`
-- `GET /api/v1/shows?cityId=city-mumbai&cinemaId=cinema-mumbai-central`
-- `GET /api/v1/shows/:showId`
+- `GET|POST /api/v1/cities`
+- `GET|PUT|DELETE /api/v1/cities/:cityId`
+- `GET|POST /api/v1/cinemas` (`GET` supports the `cityId` filter)
+- `GET|PUT|DELETE /api/v1/cinemas/:cinemaId`
+- `GET|POST /api/v1/shows` (`GET` supports `cityId` and `cinemaId` filters)
+- `GET|PUT|DELETE /api/v1/shows/:showId`
 
-List responses use `{ "data": [...] }`; item responses use `{ "data": {...} }`. Unknown item IDs return `404`.
+Create requests return `201`; delete requests return `204`. IDs are MongoDB ObjectId strings. List responses use `{ "data": [...] }`; item responses use `{ "data": {...} }`. Missing resources return `404`; invalid payloads return `400`; deleting cities or cinemas that still have dependent records returns `409`. Responses read from MongoDB, so new databases return empty lists until records are created through these endpoints or seeded.
+
+**Security:** write endpoints currently have no authentication or authorization. Keep this API on a trusted development network; do not expose it publicly until write access is protected.
 
 ## Run locally
 

@@ -7,3 +7,5 @@ export type Show = {
   language: string;
   format: string;
 };
+
+export type ShowInput = Omit<Show, "id">;

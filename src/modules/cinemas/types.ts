@@ -4,3 +4,5 @@ export type Cinema = {
   cityId: string;
   address: string;
 };
+
+export type CinemaInput = Omit<Cinema, "id">;
