@@ -20,7 +20,14 @@ async function shutdown(signal: NodeJS.Signals) {
 try {
   const config = loadConfig();
   app = await buildApp(config);
-  await app.listen({ port: config.port, host: config.host });
+  const logLevel = app.log.level;
+  app.log.level = "silent";
+  try {
+    await app.listen({ port: config.port, host: config.host });
+  } finally {
+    app.log.level = logLevel;
+  }
+  console.log(`Server is running on port ${config.port}`);
   process.once("SIGINT", () => void shutdown("SIGINT"));
   process.once("SIGTERM", () => void shutdown("SIGTERM"));
 } catch (error) {

@@ -61,6 +61,7 @@ Set these environment variables before starting the app:
 | `PORT` | No | `3000` | Listen port. |
 | `HOST` | No | `0.0.0.0` | Listen interface. |
 | `LOG_LEVEL` | No | `info` | Pino log level. |
+| `RATE_LIMIT_ENABLED` | No | `true` | Enable request rate limiting. Disabling it is only allowed outside production. |
 | `RATE_LIMIT_MAX` | No | `100` | Requests allowed per rate-limit window. |
 | `RATE_LIMIT_WINDOW_MS` | No | `60000` | Rate-limit window in milliseconds. |
 
@@ -92,6 +93,51 @@ pnpm dev
 ```
 
 Useful commands: `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm check`, and `pnpm start`.
+
+## Run with PM2
+
+Install PM2 globally if it is not already installed:
+
+```bash
+npm install --global pm2
+```
+
+Set `MONGODB_URI` and `MONGODB_DATABASE` in the project-root `.env` file. The file is ignored by Git; keep credentials there and do not commit them. The PM2 ecosystem config loads `.env` with Node.js, starts the built server from the project root, and runs four instances in cluster mode with `NODE_ENV=production`.
+
+Build and start the app, then check its status and logs:
+
+```bash
+pnpm build
+pm2 start ecosystem.config.cjs
+pm2 status
+pm2 logs system-design-journey
+```
+
+After code changes, rebuild and reload the app. Save the PM2 process list if you want to configure it to be restored at startup:
+
+```bash
+pnpm build
+pm2 reload system-design-journey
+pm2 save
+```
+
+## API load test
+
+The k6 load test sends requests to the city list API with 500 constant virtual users for 15 seconds:
+
+```bash
+pnpm loadtest
+```
+
+This runs the official `grafana/k6` Docker image with a pseudo-TTY, so a separate host k6 installation is not required. Run it directly in a terminal (without redirecting or piping output) to see k6 update its VU/iteration progress in place. Docker Desktop must be running. Open [http://localhost:5665](http://localhost:5665) to view live virtual users and API request metrics with the [k6 web dashboard](https://grafana.com/docs/k6/latest/results-output/web-dashboard/); k6 prints its standard end-of-test summary and threshold results when the test ends. Close the dashboard tab when you're done, since k6 waits for open dashboard sessions before exiting. For another API host, set `BASE_URL`, for example `BASE_URL=http://localhost:3000 pnpm loadtest`.
+
+The API's default rate limit is 100 requests per minute per client IP. Since local k6 virtual users share an IP, disable the limiter only on the local test server when measuring API capacity:
+
+```bash
+RATE_LIMIT_ENABLED=false pnpm dev
+```
+
+Restart the API with the flag set before running `pnpm loadtest`. The app logs a warning when rate limiting is disabled and refuses to start with this setting in production. Leave the limiter enabled outside local load testing.
 
 ## Seed development data
 

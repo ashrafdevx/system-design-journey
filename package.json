@@ -13,6 +13,7 @@
     "lint": "oxlint",
     "typecheck": "tsc --noEmit",
     "check": "bash scripts/check.sh",
+    "loadtest": "bash scripts/load/run.sh",
     "seed": "node --env-file-if-exists=.env --import tsx scripts/seed/index.ts"
   },
   "dependencies": {

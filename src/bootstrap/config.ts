@@ -7,10 +7,21 @@ export type AppConfig = {
   logLevel: string;
   host: string;
   port: number;
+  rateLimitEnabled: boolean;
   rateLimitMax: number;
   rateLimitWindow: number;
   swaggerEnabled: boolean;
 };
+
+function readBoolean(name: string, fallback: boolean) {
+  const value = process.env[name];
+  if (value === undefined) return fallback;
+
+  const normalized = value.toLowerCase();
+  if (normalized === "true") return true;
+  if (normalized === "false") return false;
+  throw new Error(`${name} must be either true or false.`);
+}
 
 function readPositiveInteger(name: string, fallback: number) {
   const value = process.env[name];
@@ -76,6 +87,11 @@ export function loadConfig(): AppConfig {
     throw new Error("PORT must be between 1 and 65535.");
   }
 
+  const rateLimitEnabled = readBoolean("RATE_LIMIT_ENABLED", true);
+  if (!rateLimitEnabled && process.env.NODE_ENV === "production") {
+    throw new Error("RATE_LIMIT_ENABLED cannot be false in production.");
+  }
+
   return {
     mongoUri,
     databaseName,
@@ -83,6 +99,7 @@ export function loadConfig(): AppConfig {
     logLevel,
     host: process.env.HOST ?? "0.0.0.0",
     port,
+    rateLimitEnabled,
     rateLimitMax: readPositiveInteger("RATE_LIMIT_MAX", 100),
     rateLimitWindow: readPositiveInteger("RATE_LIMIT_WINDOW_MS", 60_000),
     swaggerEnabled: process.env.NODE_ENV !== "production",
