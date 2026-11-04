@@ -99,10 +99,35 @@ After configuring `MONGODB_URI` and `MONGODB_DATABASE` in `.env`, run `pnpm seed
 
 ## Docker
 
-Run the API and a local MongoDB instance with Docker Compose:
+Make sure Docker Desktop is running. From the project root, start the API and a local MongoDB instance in the background:
 
 ```bash
-docker compose -f docker/compose.yaml up --build
+docker compose -f docker/compose.yaml up --build -d
 ```
 
-The API is available at `http://localhost:3000`; the MongoDB data is stored in the named `mongodb-data` volume. Set `CORS_ORIGINS` in your environment to a comma-separated list of allowed frontend origins. Stop the services with `docker compose -f docker/compose.yaml down`; use `docker compose -f docker/compose.yaml down --volumes` only when you intentionally want to remove the local database volume.
+Check that both containers are running and that the API is healthy:
+
+```bash
+docker compose -f docker/compose.yaml ps
+curl http://localhost:3000/health
+```
+
+The API is available at `http://localhost:3000`; Swagger docs are at `http://localhost:3000/docs`. To follow the API logs:
+
+```bash
+docker compose -f docker/compose.yaml logs -f app
+```
+
+MongoDB data is stored in the named `mongodb-data` volume. Stop the services while keeping the data with:
+
+```bash
+docker compose -f docker/compose.yaml down
+```
+
+Only remove the local database volume when you intentionally want to delete its data:
+
+```bash
+docker compose -f docker/compose.yaml down --volumes
+```
+
+Set `CORS_ORIGINS` in your environment to a comma-separated list of allowed frontend origins.
