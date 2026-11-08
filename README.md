@@ -123,13 +123,13 @@ pm2 save
 
 ## API load test
 
-The k6 load test sends requests to the city list API with 500 constant virtual users for 15 seconds:
+The k6 load test sends requests to the city list API with 1000 constant virtual users for 15 seconds:
 
 ```bash
 pnpm loadtest
 ```
 
-This runs the official `grafana/k6` Docker image with a pseudo-TTY, so a separate host k6 installation is not required. Run it directly in a terminal (without redirecting or piping output) to see k6 update its VU/iteration progress in place. Docker Desktop must be running. Open [http://localhost:5665](http://localhost:5665) to view live virtual users and API request metrics with the [k6 web dashboard](https://grafana.com/docs/k6/latest/results-output/web-dashboard/); k6 prints its standard end-of-test summary and threshold results when the test ends. Close the dashboard tab when you're done, since k6 waits for open dashboard sessions before exiting. For another API host, set `BASE_URL`, for example `BASE_URL=http://localhost:3000 pnpm loadtest`.
+This runs the official `grafana/k6` Docker image with a pseudo-TTY, so a separate host k6 installation is not required. Run it directly in a terminal (without redirecting or piping output) to see k6 update its VU/iteration progress in place. Docker Desktop must be running. Open [http://localhost:5665](http://localhost:5665) for live request metrics. For a simpler system view, open [http://localhost:3001/d/system-load/system-load](http://localhost:3001/d/system-load/system-load) to see whole-machine CPU usage, load averages, and memory usage in Grafana. The monitoring containers remain running after the test; stop them with `docker compose -f docker/monitoring-compose.yaml down`. k6 prints its standard end-of-test summary and threshold results when the test ends. Close the k6 dashboard tab when you're done, since k6 waits for open dashboard sessions before exiting. For another API host, set `BASE_URL`, for example `BASE_URL=http://localhost:3000 pnpm loadtest`.
 
 The API's default rate limit is 100 requests per minute per client IP. Since local k6 virtual users share an IP, disable the limiter only on the local test server when measuring API capacity:
 
@@ -158,7 +158,7 @@ docker compose -f docker/compose.yaml ps
 curl http://localhost:3000/health
 ```
 
-The API is available at `http://localhost:3000`; Swagger docs are at `http://localhost:3000/docs`. To follow the API logs:
+The API is available at `http://localhost:3000`; Swagger docs are at `http://localhost:3000/docs`. The local MongoDB browser console is at `http://localhost:8081`. It is bound to localhost and connects only to the Compose MongoDB (`bookmyshow`), not production. Do not expose this unauthenticated development console to a public network. To follow the API logs:
 
 ```bash
 docker compose -f docker/compose.yaml logs -f app

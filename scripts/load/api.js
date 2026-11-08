@@ -12,7 +12,7 @@ export const options = {
   scenarios: {
     api_load: {
       executor: "constant-vus",
-      vus: 500,
+      vus: 1000,
       duration: "15s",
       gracefulStop: "5s",
     },
